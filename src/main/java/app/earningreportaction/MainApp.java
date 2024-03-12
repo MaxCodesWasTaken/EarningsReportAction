@@ -13,10 +13,11 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         try {
             // Replace '/your/fxml/file.fxml' with the path to your actual FXML file
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/app/earningreportaction/main-view.fxml")));
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/main-view.fxml")));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Earnings Report Action");
+            primaryStage.setMaximized(true);
             primaryStage.show();
         } catch (Exception e) {
             System.out.println("Failed to Load FXML File" + e.fillInStackTrace());

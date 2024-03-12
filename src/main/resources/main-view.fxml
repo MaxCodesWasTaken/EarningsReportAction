@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController">
+    <!-- List of stocks with earnings dates -->
+    <VBox HBox.hgrow="ALWAYS" maxWidth="400" minWidth="0.0" prefWidth="0.25">
+        <ListView fx:id="stocksListView" onMouseClicked="#handleStockClick" prefHeight="600.0" HBox.hgrow="ALWAYS"/>
+    </VBox>
+
+    <!-- Your existing VBox adjusted to take up the remaining 3/4 of the width -->
+    <VBox alignment="TOP_RIGHT" spacing="20.0" HBox.hgrow="ALWAYS">
+        <TextField fx:id="searchField"/>
+        <Button text="Search" onAction="#searchStock"/>
+        <TextArea fx:id="resultArea" prefHeight="200.0" prefWidth="200.0"/>
+    </VBox>
+</HBox>

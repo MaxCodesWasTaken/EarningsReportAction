@@ -1,6 +1,8 @@
-package app.earningreportaction;
+package app.earningreportaction.controller;
 
 import javafx.application.Platform;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import javafx.fxml.FXML;
@@ -16,7 +18,8 @@ public class MainController {
     private TextField searchField;
     @FXML
     private TextArea resultArea;
-
+    @FXML
+    private ListView<String> stocksListView;
     private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -25,6 +28,14 @@ public class MainController {
         String symbol = searchField.getText().trim();
         if (!symbol.isEmpty()) {
             getStockPrice(symbol);
+        }
+    }
+    @FXML
+    private void handleStockClick(MouseEvent event) {
+        String selectedStock = stocksListView.getSelectionModel().getSelectedItem();
+        if (selectedStock != null) {
+            // Handle the click event, for example, display the stock details
+            resultArea.setText("You selected: " + selectedStock);
         }
     }
     private void getStockPrice(String symbol) {
