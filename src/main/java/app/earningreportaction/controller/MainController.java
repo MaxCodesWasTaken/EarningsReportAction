@@ -2,25 +2,25 @@ package app.earningreportaction.controller;
 
 import app.earningreportaction.model.EarningsDataModel;
 import javafx.application.Platform;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ListCell;
-import javafx.scene.paint.Color;
-import javafx.util.Callback;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class MainController {
     @FXML
@@ -28,16 +28,26 @@ public class MainController {
     @FXML
     private TextArea resultArea;
     @FXML
+    private DatePicker datePicker;
+    @FXML
+    private ComboBox<String> importanceComboBox;
+    @FXML
     private ListView<String> stocksListView;
+
+    private List<EarningsDataModel> allEarningsData;
     private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
     private void initialize()  {
         // Initialize your data and set up the TableView
-        List<EarningsDataModel> earningsData = fetchEarningsCalendar();
-        List<String> parsedEarningsData = parseEarnings(earningsData);
-        if(!earningsData.isEmpty()) {
+        LocalDate today = LocalDate.now();
+        allEarningsData = fetchEarningsCalendar();
+        importanceComboBox.getItems().addAll("All Stocks", "3 and above", "Market Movers");
+        List<String> parsedEarningsData = parseEarnings(allEarningsData, today);
+        datePicker.setValue(LocalDate.now());
+        importanceComboBox.setValue("All Stocks");
+        if(!allEarningsData.isEmpty()) {
             stocksListView.setItems(FXCollections.observableArrayList(parsedEarningsData));
         }
         stocksListView.setCellFactory(lv -> new ListCell<String>() {
@@ -133,11 +143,44 @@ public class MainController {
         }
         return earningsList;
     }
-    private List<String> parseEarnings (List<EarningsDataModel> earnings){
+    private List<String> parseEarnings (List<EarningsDataModel> earnings, LocalDate datetime){
         List<String> formatted = new ArrayList<>();
-        for(EarningsDataModel stock: earnings){
+        List<EarningsDataModel> filteredEarningsData = new ArrayList<>(earnings.stream()
+                .filter(data -> !LocalDate.parse(data.getDate()).isBefore(datetime))
+                .toList());
+        Collections.sort(filteredEarningsData);
+        for(EarningsDataModel stock: filteredEarningsData){
             formatted.add(stock.toString());
         }
         return formatted;
+    }
+    @FXML
+    private void handleFilterAction() {
+        String selectedImportance = importanceComboBox.getValue();
+        LocalDate selectedDate = datePicker.getValue();
+
+        Stream<EarningsDataModel> stream = allEarningsData.stream();
+
+        if (selectedImportance != null && !selectedImportance.equals("All Stocks")) {
+            if (selectedImportance.equals("3 and above")) {
+                stream = stream.filter(data -> data.getImportance() >= 3);
+            }
+            else {
+                stream = stream.filter(data -> data.getImportance().equals(5));
+            }
+        }
+        if (selectedDate != null) {
+            stream = stream.filter(data -> LocalDate.parse(data.getDate()).isEqual(selectedDate));
+        }
+
+        List<EarningsDataModel> filteredData = stream.sorted().collect(toList());
+        updateListView(filteredData);
+    }
+
+    private void updateListView(List<EarningsDataModel> data) {
+        List<String> displayData = data.stream()
+                .map(EarningsDataModel::toString) // Assuming you've overridden toString() method in EarningsDataModel for display
+                .collect(Collectors.toList());
+        stocksListView.setItems(FXCollections.observableArrayList(displayData));
     }
 }
