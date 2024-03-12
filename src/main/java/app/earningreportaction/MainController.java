@@ -17,7 +17,7 @@ public class MainController {
     @FXML
     private TextArea resultArea;
 
-    private static final String API_KEY = "YOUR_API_KEY_HERE";
+    private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
@@ -41,7 +41,7 @@ public class MainController {
     private void processStockData(String response) {
         // Parse the response using org.json or another JSON library
         JSONArray jsonArray = new JSONArray(response);
-        if (jsonArray.isEmpty()) {
+        if (!jsonArray.isEmpty()) {
             JSONObject stockData = jsonArray.getJSONObject(0); // Assuming the first object is the one we need
 
             String symbol = stockData.getString("symbol");
