@@ -15,5 +15,6 @@ module app.earningreportaction {
     opens app.earningreportaction to javafx.fxml;
     exports app.earningreportaction;
     exports app.earningreportaction.controller;
+    exports app.earningreportaction.model;
     opens app.earningreportaction.controller to javafx.fxml;
 }

@@ -8,8 +8,8 @@
 
 <HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController">
     <!-- List of stocks with earnings dates -->
-    <VBox HBox.hgrow="ALWAYS" maxWidth="400" minWidth="0.0" prefWidth="0.25">
-        <ListView fx:id="stocksListView" onMouseClicked="#handleStockClick" prefHeight="600.0" HBox.hgrow="ALWAYS"/>
+    <VBox maxWidth="400" minWidth="0.0" prefWidth="400" VBox.vgrow="ALWAYS">
+        <ListView fx:id="stocksListView" onMouseClicked="#handleStockClick" VBox.vgrow="ALWAYS"/>
     </VBox>
 
     <!-- Your existing VBox adjusted to take up the remaining 3/4 of the width -->
