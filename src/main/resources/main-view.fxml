@@ -7,7 +7,7 @@
 <?import javafx.geometry.Insets?>
 
 <?import javafx.scene.layout.BorderPane?>
-<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController">
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController" stylesheets="@main.css">
     <!-- List of stocks with earnings dates -->
     <BorderPane VBox.vgrow="ALWAYS" maxWidth="200" minWidth="0.0" prefWidth="200">
         <center>
@@ -24,10 +24,12 @@
         </bottom>
     </BorderPane>
     <!-- Your existing VBox adjusted to take up the remaining 3/4 of the width -->
-    <VBox alignment="TOP_RIGHT" spacing="20.0" HBox.hgrow="ALWAYS">
+    <VBox alignment="TOP_CENTER" spacing="20.0" HBox.hgrow="ALWAYS">
+        <HBox.margin>
+            <Insets top="25" left="25" right="25" bottom="50"/>
+        </HBox.margin>
         <TextField fx:id="searchField"/>
-        <Button text="Search" onAction="#searchStock" layoutY="20"/>
-        <TextArea fx:id="resultArea" prefHeight="200.0" prefWidth="200.0"/>
-
+        <Button text="Search" onAction="#searchStock"/>
+        <TextArea fx:id="resultArea" prefHeight="800.0" prefWidth="200.0" />
     </VBox>
 </HBox>

@@ -19,7 +19,8 @@ import javafx.collections.FXCollections;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import javafx.scene.text.TextFlow;
+import javafx.scene.text.Text;
 import static java.util.stream.Collectors.toList;
 
 public class MainController {
@@ -54,14 +55,29 @@ public class MainController {
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
-                    setText(null);
+                    setGraphic(null);
                     setStyle("");
-                } else {
-                    setText(item);
+                }
+                else {
+                    String[] lines = item.split("\n", -1);
+                    TextFlow textFlow = new TextFlow();
+                    if (lines.length > 0) {
+                        // Make the first line bold
+                        Text firstLine = new Text(lines[0] + "\n");
+                        firstLine.setStyle("-fx-font-family: 'arial'; -fx-font-weight: bold; -fx-font-size: 16;");
+                        textFlow.getChildren().add(firstLine);
+                        // Add the rest of the lines as normal Text nodes
+                        for (int i = 1; i < lines.length; i++) {
+                            Text line = new Text(lines[i] + (i < lines.length - 1 ? "\n" : ""));
+                            textFlow.getChildren().add(line);
+                        }
+                    }
+                    setGraphic(textFlow);
+                    // Apply alternating background color
                     if (getIndex() % 2 == 0) {
-                        setStyle("-fx-background-color: lightblue;");
+                        setStyle("-fx-background-color: #7f4c9e;");
                     } else {
-                        setStyle("-fx-background-color: #629dfc; -fx-text-fill: white;");
+                        setStyle("-fx-background-color: #432c52; -fx-text-fill: white;");
                     }
                 }
             }
