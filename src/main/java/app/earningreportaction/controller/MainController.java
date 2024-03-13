@@ -2,8 +2,11 @@ package app.earningreportaction.controller;
 
 import app.earningreportaction.model.EarningsDataModel;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import javafx.fxml.FXML;
@@ -39,7 +42,21 @@ public class MainController {
     @FXML
     private Label stockTickerSymbol;
     @FXML
-    private Label currentPrice;
+    private Label currentPriceLabel;
+    @FXML
+    private Label bidPriceLabel;
+    @FXML
+    private Label askPriceLabel;
+    @FXML
+    private Label volumeLabel;
+    @FXML
+    private Label windowTitle;
+    @FXML
+    private Button minimizeButton;
+    @FXML
+    private Button maximizeButton;
+    @FXML
+    private Button closeButton;
 
     private List<EarningsDataModel> allEarningsData;
     private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
@@ -48,6 +65,7 @@ public class MainController {
     @FXML
     private void initialize()  {
         // Initialize your data and set up the TableView
+        //windowTitle.setText("Earnings Report Action Tool");
         LocalDate today = LocalDate.now();
         allEarningsData = fetchEarningsCalendar();
         importanceComboBox.getItems().addAll("All Stocks", "3 and above", "Market Movers");
@@ -128,6 +146,8 @@ public class MainController {
                 String symbol = stockData.optString("symbol");
                 double bidPrice = stockData.optDouble("bidPrice");
                 double askPrice = stockData.optDouble("askPrice");
+                int bidSize = stockData.optIntegerObject("bidSize");
+                int askSize = stockData.optIntegerObject("askSize");
                 double lastSalePrice = stockData.optDouble("lastSalePrice");
                 long volume = stockData.optLong("volume");
 
@@ -140,12 +160,23 @@ public class MainController {
                 Platform.runLater(() -> {
                     // Assuming 'stockTickerSymbol', 'stockGraph', and 'currentPrice' are fx:id in your FXML
                     stockTickerSymbol.setText(symbol); // Set the ticker symbol
-                    currentPrice.setText(String.format("$%.2f", lastSalePrice)); // Set the current price
+                    currentPriceLabel.setText(String.format("$%.2f", lastSalePrice)); // Set the current price
+                    bidPriceLabel.setText("Bid: " + String.format("$%.2f", bidPrice) + " x " + bidSize);
+                    askPriceLabel.setText("Ask: " + String.format("$%.2f", askPrice) + " x " + askSize);
+                    volumeLabel.setText("Volume: " + volume);
+                    format();
                 });
             }
         } catch (Exception e) {
             System.out.println("Failed to retrieve stock data");
         }
+    }
+    private void format(){
+        stockTickerSymbol.setStyle("-fx-font-size: 90px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Tahoma'");
+        currentPriceLabel.setStyle("-fx-font-size: 50px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
+        bidPriceLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
+        askPriceLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
+        volumeLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
     }
     public List<EarningsDataModel> fetchEarningsCalendar() {
         List<EarningsDataModel> earningsList = new ArrayList<>();
@@ -215,5 +246,17 @@ public class MainController {
                 .map(EarningsDataModel::toString) // Assuming you've overridden toString() method in EarningsDataModel for display
                 .collect(Collectors.toList());
         stocksListView.setItems(FXCollections.observableArrayList(displayData));
+    }
+    public void minimizeWindow(ActionEvent event) {
+        ((Stage)((Button)event.getSource()).getScene().getWindow()).setIconified(true);
+    }
+
+    public void maximizeWindow(ActionEvent event) {
+        Stage stage = ((Stage)((Button)event.getSource()).getScene().getWindow());
+        stage.setFullScreen(!stage.isFullScreen());
+    }
+
+    public void closeWindow(ActionEvent event) {
+        ((Stage)((Button)event.getSource()).getScene().getWindow()).close();
     }
 }

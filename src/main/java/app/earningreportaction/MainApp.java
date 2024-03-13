@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.stage.StageStyle;
 
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ public class MainApp extends Application {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/main-view.fxml")));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.setTitle("Earnings Report Action");
             primaryStage.setMaximized(true);
             primaryStage.show();

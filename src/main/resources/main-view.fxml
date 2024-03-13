@@ -9,34 +9,59 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
-<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController" stylesheets="@main.css">
-    <!-- List of stocks with earnings dates -->
-    <BorderPane VBox.vgrow="ALWAYS" maxWidth="200" minWidth="0.0" prefWidth="200">
-        <center>
-            <VBox VBox.vgrow="ALWAYS">
-                <ListView fx:id="stocksListView" onMouseClicked="#handleStockClick" VBox.vgrow="ALWAYS"/>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController" stylesheets="@main.css">
+    <!-- Custom Title Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="windowTitle" text="Earnings Report Action" styleClass="window-title"/>
+            <Region HBox.hgrow="ALWAYS"/> <!-- This pushes the following HBox to the right -->
+            <HBox styleClass="win-buttons">
+                <Button fx:id="minimizeButton" text="_" onAction="#minimizeWindow"/>
+                <Button fx:id="maximizeButton" text="☐" onAction="#maximizeWindow"/>
+            </HBox>
+            <HBox styleClass="clo-button">
+                <Button fx:id="closeButton" text="X" onAction="#closeWindow"/>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Main content area -->
+    <center>
+        <HBox HBox.hgrow="ALWAYS">
+            <BorderPane VBox.vgrow="ALWAYS" maxWidth="400" minWidth="0.0" prefWidth="400">
+                <center>
+                    <VBox VBox.vgrow="ALWAYS">
+                        <ListView fx:id="stocksListView" onMouseClicked="#handleStockClick" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </center>
+                <bottom>
+                    <VBox alignment="CENTER" spacing="10" minHeight="150">
+                        <ComboBox fx:id="importanceComboBox" />
+                        <DatePicker fx:id="datePicker" />
+                        <Button text="Filter" onAction="#handleFilterAction"/>
+                    </VBox>
+                </bottom>
+            </BorderPane>
+
+            <VBox alignment="TOP_CENTER" spacing="20.0" VBox.Vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                <TextField fx:id="searchField"/>
+                <Button text="Search" onAction="#searchStock"/>
+                <padding>
+                    <Insets top="25" right="25" bottom="50" left="25"/>
+                </padding>
+                <StackPane alignment="TOP_LEFT" prefHeight="850" minWidth = "1000"  style = "-fx-background-radius: 10; -fx-background-color: #170126; -fx-border-width: 5px ;-fx-border-color: #e5c8fa; -fx-border-radius: 50px;">
+                    <VBox spacing="3.0" >
+                        <padding>
+                            <Insets top="25" right="25" bottom="50" left="25"/>
+                        </padding>
+                        <Label fx:id="stockTickerSymbol"/>
+                        <Label fx:id="currentPriceLabel"/>
+                        <Label fx:id="bidPriceLabel"/>
+                        <Label fx:id="askPriceLabel"/>
+                        <Label fx:id="volumeLabel"/>
+                    </VBox>
+                </StackPane>
             </VBox>
-        </center>
-        <bottom>
-            <VBox alignment="CENTER" spacing="10" minHeight="150">
-                <ComboBox fx:id="importanceComboBox" />
-                <DatePicker fx:id="datePicker" />
-                <Button text="Filter" onAction="#handleFilterAction"/>
-            </VBox>
-        </bottom>
-    </BorderPane>
-    <!-- Your existing VBox adjusted to take up the remaining 3/4 of the width -->
-    <VBox alignment="TOP_CENTER" spacing="20.0" HBox.hgrow="ALWAYS">
-        <HBox.margin>
-            <Insets top="25" left="25" right="25" bottom="50"/>
-        </HBox.margin>
-        <TextField fx:id="searchField"/>
-        <Button text="Search" onAction="#searchStock"/>
-        <StackPane alignment="TOP_LEFT" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10; -fx-background-color: #e5c8fa;">
-            <VBox alignment="TOP_LEFT" spacing="5.0">
-                <Label fx:id="stockTickerSymbol" style="-fx-font-size: 60px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Helvetica';"/>
-                <Label fx:id="currentPrice" style="-fx-font-size: 36px; -fx-text-fill: #ffffff; -fx-font-family: 'Helvetica';"/>
-            </VBox>
-        </StackPane>
-    </VBox>
-</HBox>
+        </HBox>
+    </center>
+</BorderPane>

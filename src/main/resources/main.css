@@ -37,3 +37,25 @@
   -fx-background-color:  #e5c8fa;
   -fx-text-fill: #000000;
 }
+.scroll-bar:vertical {
+    -fx-background-color: #6a1b9a; /* Color for the background of the scrollbar track */
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #ab47bc; /* Color for the scrollbar thumb */
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 5em;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: #6a1b9a; /* Color for the increment and decrement buttons */
+}
+.win-buttons {
+    -fx-background-color: #6a1b9a;
+    -fx-text-fill: #ffffff;
+}
+.clo-button {
+    -fx-background-color: #ff0000;
+    -fx-text-fill: #000000;
+}
