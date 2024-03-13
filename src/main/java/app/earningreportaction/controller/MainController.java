@@ -12,8 +12,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import javafx.collections.FXCollections;
 import java.time.LocalDate;
@@ -34,6 +36,10 @@ public class MainController {
     private ComboBox<String> importanceComboBox;
     @FXML
     private ListView<String> stocksListView;
+    @FXML
+    private Label stockTickerSymbol;
+    @FXML
+    private Label currentPrice;
 
     private List<EarningsDataModel> allEarningsData;
     private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
@@ -87,19 +93,20 @@ public class MainController {
     private void searchStock() {
         String symbol = searchField.getText().trim();
         if (!symbol.isEmpty()) {
-            getStockPrice(symbol);
+            getStock(symbol);
         }
     }
     @FXML
     private void handleStockClick(MouseEvent event) {
         String selectedStock = stocksListView.getSelectionModel().getSelectedItem();
+
         if (selectedStock != null) {
             // Handle the click event, for example, display the stock details
-            resultArea.setText("You selected: " + selectedStock);
+            getStock(selectedStock.split("\n")[0]);
         }
     }
-    private void getStockPrice(String symbol) {
-        String uri = "https://cloud.iexapis.com/stable/tops?token=" + API_KEY + "&symbols=" + symbol;
+    private void getStock(String symbol) {
+        String uri = "https://api.iex.cloud/v1/data/core/iex_tops/"+symbol+"?token=" + API_KEY;
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
                 .build();
@@ -110,24 +117,34 @@ public class MainController {
                 .join();
     }
     private void processStockData(String response) {
-        // Parse the response using org.json or another JSON library
-        JSONArray jsonArray = new JSONArray(response);
-        if (!jsonArray.isEmpty()) {
-            JSONObject stockData = jsonArray.getJSONObject(0); // Assuming the first object is the one we need
+        if (response == null){
+            return;
+        }
+        try {
+            JSONArray jsonArray = new JSONArray(response);
+            if (!jsonArray.isEmpty()) {
+                JSONObject stockData = jsonArray.getJSONObject(0); // Assuming the first object is the one we need
 
-            String symbol = stockData.getString("symbol");
-            double bidPrice = stockData.getDouble("bidPrice");
-            double askPrice = stockData.getDouble("askPrice");
-            double lastSalePrice = stockData.getDouble("lastSalePrice");
-            long volume = stockData.getLong("volume");
+                String symbol = stockData.optString("symbol");
+                double bidPrice = stockData.optDouble("bidPrice");
+                double askPrice = stockData.optDouble("askPrice");
+                double lastSalePrice = stockData.optDouble("lastSalePrice");
+                long volume = stockData.optLong("volume");
 
-            // Update your UI with the extracted data
-            // This must be run on the JavaFX application thread
-            Platform.runLater(() -> {
-                resultArea.setText("Symbol: " + symbol + "\nBid Price: " + bidPrice
-                        + "\nAsk Price: " + askPrice + "\nLast Sale Price: "
-                        + lastSalePrice + "\nVolume: " + volume);
-            });
+                // Convert timestamp to a human-readable format, if necessary
+                long lastUpdated = stockData.optLong("lastUpdated");
+                String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastUpdated));
+
+                // Update your UI with the extracted data
+                // This must be run on the JavaFX application thread
+                Platform.runLater(() -> {
+                    // Assuming 'stockTickerSymbol', 'stockGraph', and 'currentPrice' are fx:id in your FXML
+                    stockTickerSymbol.setText(symbol); // Set the ticker symbol
+                    currentPrice.setText(String.format("$%.2f", lastSalePrice)); // Set the current price
+                });
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to retrieve stock data");
         }
     }
     public List<EarningsDataModel> fetchEarningsCalendar() {

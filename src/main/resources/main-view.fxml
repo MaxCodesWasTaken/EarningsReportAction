@@ -7,6 +7,8 @@
 <?import javafx.geometry.Insets?>
 
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <HBox xmlns:fx="http://javafx.com/fxml" fx:controller="app.earningreportaction.controller.MainController" stylesheets="@main.css">
     <!-- List of stocks with earnings dates -->
     <BorderPane VBox.vgrow="ALWAYS" maxWidth="200" minWidth="0.0" prefWidth="200">
@@ -30,6 +32,11 @@
         </HBox.margin>
         <TextField fx:id="searchField"/>
         <Button text="Search" onAction="#searchStock"/>
-        <TextArea fx:id="resultArea" prefHeight="800.0" prefWidth="200.0" />
+        <StackPane alignment="TOP_LEFT" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10; -fx-background-color: #e5c8fa;">
+            <VBox alignment="TOP_LEFT" spacing="5.0">
+                <Label fx:id="stockTickerSymbol" style="-fx-font-size: 60px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Helvetica';"/>
+                <Label fx:id="currentPrice" style="-fx-font-size: 36px; -fx-text-fill: #ffffff; -fx-font-family: 'Helvetica';"/>
+            </VBox>
+        </StackPane>
     </VBox>
 </HBox>
