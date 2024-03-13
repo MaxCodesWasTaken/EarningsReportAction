@@ -51,6 +51,9 @@
 .scroll-bar:vertical .decrement-button {
     -fx-background-color: #6a1b9a; /* Color for the increment and decrement buttons */
 }
+.window-title{
+    -fx-text-fill: #ffffff;
+}
 .win-buttons {
     -fx-background-color: #6a1b9a;
     -fx-text-fill: #ffffff;
@@ -58,4 +61,20 @@
 .clo-button {
     -fx-background-color: #ff0000;
     -fx-text-fill: #000000;
+}
+.primary-metric{
+    -fx-font-family: "Open Sans";
+    -fx-text-weight: "bold";
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 100px;
+}
+.secondary-metric{
+    -fx-font-family: "Open Sans";
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 50px;
+}
+.tertiary-metric{
+    -fx-font-family: "Open Sans";
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 25px
 }

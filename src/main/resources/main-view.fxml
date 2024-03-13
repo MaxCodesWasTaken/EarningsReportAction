@@ -13,14 +13,14 @@
     <!-- Custom Title Bar -->
     <top>
         <HBox alignment="CENTER_LEFT">
-            <Label fx:id="windowTitle" text="Earnings Report Action" styleClass="window-title"/>
+            <Label fx:id="windowTitle" text=" Earnings Report Action" styleClass="window-title"/>
             <Region HBox.hgrow="ALWAYS"/> <!-- This pushes the following HBox to the right -->
-            <HBox styleClass="win-buttons">
-                <Button fx:id="minimizeButton" text="_" onAction="#minimizeWindow"/>
-                <Button fx:id="maximizeButton" text="☐" onAction="#maximizeWindow"/>
+            <HBox>
+                <Button styleClass="win-buttons" fx:id="minimizeButton" text="_" onAction="#minimizeWindow"/>
+                <Button styleClass="win-buttons" fx:id="maximizeButton" text="☐" onAction="#maximizeWindow"/>
             </HBox>
-            <HBox styleClass="clo-button">
-                <Button fx:id="closeButton" text="X" onAction="#closeWindow"/>
+            <HBox>
+                <Button styleClass="clo-button" fx:id="closeButton" text="X" onAction="#closeWindow"/>
             </HBox>
         </HBox>
     </top>
@@ -54,11 +54,15 @@
                         <padding>
                             <Insets top="25" right="25" bottom="50" left="25"/>
                         </padding>
-                        <Label fx:id="stockTickerSymbol"/>
-                        <Label fx:id="currentPriceLabel"/>
-                        <Label fx:id="bidPriceLabel"/>
-                        <Label fx:id="askPriceLabel"/>
-                        <Label fx:id="volumeLabel"/>
+                        <Label fx:id="stockTickerSymbol" styleClass="primary-metric"/>
+                        <Label fx:id="currentPriceLabel" styleClass="secondary-metric"/>
+                        <Label fx:id="bidPriceLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="askPriceLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="volumeLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="openLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="closeLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="highLabel" styleClass="tertiary-metric"/>
+                        <Label fx:id="lowLabel" styleClass="tertiary-metric"/>
                     </VBox>
                 </StackPane>
             </VBox>

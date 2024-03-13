@@ -1,6 +1,7 @@
 package app.earningreportaction.controller;
 
 import app.earningreportaction.model.EarningsDataModel;
+import app.earningreportaction.model.StockOpenCloseModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -16,10 +17,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import javafx.collections.FXCollections;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
@@ -50,6 +49,14 @@ public class MainController {
     @FXML
     private Label volumeLabel;
     @FXML
+    private Label openLabel;
+    @FXML
+    private Label closeLabel;
+    @FXML
+    private Label highLabel;
+    @FXML
+    private Label lowLabel;
+    @FXML
     private Label windowTitle;
     @FXML
     private Button minimizeButton;
@@ -58,7 +65,10 @@ public class MainController {
     @FXML
     private Button closeButton;
 
-    private List<EarningsDataModel> allEarningsData;
+    private final List<EarningsDataModel> allEarningsData = new ArrayList<EarningsDataModel>();
+
+    private final HashMap<String, StockOpenCloseModel> checkedStocks = new HashMap<>();
+
     private static final String API_KEY = "pk_5eb2e76ca8544c9ab0b0115b4fbc1f75";
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -67,7 +77,7 @@ public class MainController {
         // Initialize your data and set up the TableView
         //windowTitle.setText("Earnings Report Action Tool");
         LocalDate today = LocalDate.now();
-        allEarningsData = fetchEarningsCalendar();
+        fetchEarningsCalendar();
         importanceComboBox.getItems().addAll("All Stocks", "3 and above", "Market Movers");
         List<String> parsedEarningsData = parseEarnings(allEarningsData, today);
         datePicker.setValue(LocalDate.now());
@@ -109,7 +119,7 @@ public class MainController {
     }
     @FXML
     private void searchStock() {
-        String symbol = searchField.getText().trim();
+        String symbol = searchField.getText().trim().toUpperCase();
         if (!symbol.isEmpty()) {
             getStock(symbol);
         }
@@ -133,6 +143,22 @@ public class MainController {
                 .thenApply(HttpResponse::body)
                 .thenAccept(this::processStockData)
                 .join();
+
+        StockOpenCloseModel sOCHL = checkedStocks.get(symbol);
+        if (sOCHL == null){
+            StockOpenCloseModel stock = fetchStockOCHL(symbol);
+            checkedStocks.put(symbol, stock);
+            openLabel.setText("Open: "+stock.getOpen());
+            closeLabel.setText("Close: "+stock.getClose());
+            highLabel.setText("High: "+stock.getHigh());
+            lowLabel.setText("Low: "+stock.getLow());
+        }
+        else {
+            openLabel.setText("Open: "+sOCHL.getOpen());
+            closeLabel.setText("Close: "+sOCHL.getClose());
+            highLabel.setText("High: "+sOCHL.getHigh());
+            lowLabel.setText("Low: "+sOCHL.getLow());
+        }
     }
     private void processStockData(String response) {
         if (response == null){
@@ -164,22 +190,13 @@ public class MainController {
                     bidPriceLabel.setText("Bid: " + String.format("$%.2f", bidPrice) + " x " + bidSize);
                     askPriceLabel.setText("Ask: " + String.format("$%.2f", askPrice) + " x " + askSize);
                     volumeLabel.setText("Volume: " + volume);
-                    format();
                 });
             }
         } catch (Exception e) {
             System.out.println("Failed to retrieve stock data");
         }
     }
-    private void format(){
-        stockTickerSymbol.setStyle("-fx-font-size: 90px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Tahoma'");
-        currentPriceLabel.setStyle("-fx-font-size: 50px; -fx-text-weight: bold; -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
-        bidPriceLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
-        askPriceLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
-        volumeLabel.setStyle("-fx-font-size: 30px;  -fx-text-fill: #ffffff; -fx-font-family: 'Arial'");
-    }
-    public List<EarningsDataModel> fetchEarningsCalendar() {
-        List<EarningsDataModel> earningsList = new ArrayList<>();
+    public void fetchEarningsCalendar() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.stocktwits.com/api/2/discover/earnings_calendar"))
@@ -198,14 +215,43 @@ public class MainController {
                     String earningsDate = stock.getString("date");
                     String time = stock.getString("time");
                     Integer importance = stock.getInt("importance");
-                    earningsList.add(new EarningsDataModel(symbol, title, earningsDate, time, importance));
+                    allEarningsData.add(new EarningsDataModel(symbol, title, earningsDate, time, importance));
                 }
             });
         }
         catch (Exception e){
             System.out.println("Unable to get earnings calendar");
         }
-        return earningsList;
+    }
+    public StockOpenCloseModel fetchStockOCHL(String stockTicker) {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.polygon.io/v2/aggs/ticker/"+stockTicker+"/prev?adjusted=true&apiKey=kXovlxMMEqF0izpuvLEUUBWlc9KspgpA"))
+                .build();
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jsonObject = new JSONObject(response.body());
+
+            // Get the JSON array "results"
+            JSONArray resultsArray = jsonObject.getJSONArray("results");
+            // Check if the array is not empty and get the first object
+            if (!resultsArray.isEmpty()) {
+                JSONObject stockInfo = resultsArray.getJSONObject(0);
+
+                String symbol = stockInfo.getString("T");
+                Double open = stockInfo.getDouble("o");
+                Double close = stockInfo.getDouble("c");
+                Double high = stockInfo.getDouble("h");
+                Double low = stockInfo.getDouble("l");
+                // Assuming StockOpenCloseModel constructor is defined as
+                // StockOpenCloseModel(String symbol, Double open, Double close, Double high, Double low)
+                return new StockOpenCloseModel(symbol, open, close, high, low);
+            }
+        }
+        catch (Exception e) {
+            System.out.println("Unable to get stockOCHL data for "+stockTicker);
+        }
+        return null;
     }
     private List<String> parseEarnings (List<EarningsDataModel> earnings, LocalDate datetime){
         List<String> formatted = new ArrayList<>();
