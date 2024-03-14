@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import javafx.fxml.FXML;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -46,6 +48,10 @@ public class MainController {
     private Label bidPriceLabel;
     @FXML
     private Label askPriceLabel;
+    @FXML
+    private Label lastUpdatedLabel;
+    @FXML
+    private Label changePriceLabel;
     @FXML
     private Label volumeLabel;
     @FXML
@@ -134,16 +140,6 @@ public class MainController {
         }
     }
     private void getStock(String symbol) {
-        String uri = "https://api.iex.cloud/v1/data/core/iex_tops/"+symbol+"?token=" + API_KEY;
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .build();
-
-        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenAccept(this::processStockData)
-                .join();
-
         StockOpenCloseModel sOCHL = checkedStocks.get(symbol);
         if (sOCHL == null){
             StockOpenCloseModel stock = fetchStockOCHL(symbol);
@@ -159,6 +155,16 @@ public class MainController {
             highLabel.setText("High: "+sOCHL.getHigh());
             lowLabel.setText("Low: "+sOCHL.getLow());
         }
+        String uri = "https://api.iex.cloud/v1/data/core/iex_tops/"+symbol+"?token=" + API_KEY;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .build();
+
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(this::processStockData)
+                .join();
+
     }
     private void processStockData(String response) {
         if (response == null){
@@ -174,22 +180,33 @@ public class MainController {
                 double askPrice = stockData.optDouble("askPrice");
                 int bidSize = stockData.optIntegerObject("bidSize");
                 int askSize = stockData.optIntegerObject("askSize");
-                double lastSalePrice = stockData.optDouble("lastSalePrice");
+                double lastSalePrice = round(stockData.optDouble("lastSalePrice"));
                 long volume = stockData.optLong("volume");
 
                 // Convert timestamp to a human-readable format, if necessary
                 long lastUpdated = stockData.optLong("lastUpdated");
                 String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastUpdated));
-
+                double close = checkedStocks.get(symbol).getClose();
+                double change = round(lastSalePrice - close);
+                double changePercent = round(change / close);
                 // Update your UI with the extracted data
                 // This must be run on the JavaFX application thread
                 Platform.runLater(() -> {
                     // Assuming 'stockTickerSymbol', 'stockGraph', and 'currentPrice' are fx:id in your FXML
                     stockTickerSymbol.setText(symbol); // Set the ticker symbol
                     currentPriceLabel.setText(String.format("$%.2f", lastSalePrice)); // Set the current price
+                    if (change > 0) {
+                        changePriceLabel.setText(String.format("$%.2f", change)+" (+"+String.format("%.2f", changePercent) + "%)");
+                        changePriceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1d5c34;");
+                    }
+                    else {
+                        changePriceLabel.setText(String.format("$%.2f", change)+ " ("+String.format("%.2f", changePercent) + "%)");
+                        changePriceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #b00f00;");
+                    }
                     bidPriceLabel.setText("Bid: " + String.format("$%.2f", bidPrice) + " x " + bidSize);
                     askPriceLabel.setText("Ask: " + String.format("$%.2f", askPrice) + " x " + askSize);
                     volumeLabel.setText("Volume: " + volume);
+                    lastUpdatedLabel.setText("Last updated:" + formattedDate);
                 });
             }
         } catch (Exception e) {
@@ -304,5 +321,10 @@ public class MainController {
 
     public void closeWindow(ActionEvent event) {
         ((Stage)((Button)event.getSource()).getScene().getWindow()).close();
+    }
+    private double round(double value) {
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

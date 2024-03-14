@@ -54,15 +54,24 @@
                         <padding>
                             <Insets top="25" right="25" bottom="50" left="25"/>
                         </padding>
-                        <Label fx:id="stockTickerSymbol" styleClass="primary-metric"/>
-                        <Label fx:id="currentPriceLabel" styleClass="secondary-metric"/>
-                        <Label fx:id="bidPriceLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="askPriceLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="volumeLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="openLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="closeLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="highLabel" styleClass="tertiary-metric"/>
-                        <Label fx:id="lowLabel" styleClass="tertiary-metric"/>
+                        <VBox HBox.hgrow="ALWAYS" prefHeight="80">
+                            <Label fx:id="stockTickerSymbol" styleClass="primary-metric"/>
+                            <Label fx:id="currentPriceLabel" styleClass="secondary-metric"/>
+                            <Label fx:id="changePriceLabel" styleClass="tertiary-metric"/>
+                        </VBox>
+                        <VBox HBox.hgrow="ALWAYS" >
+                            <padding>
+                                <Insets left="25" top = "50"/>
+                            </padding>
+                            <Label fx:id="bidPriceLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="askPriceLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="volumeLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="openLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="closeLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="highLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="lowLabel" styleClass="tertiary-metric"/>
+                            <Label fx:id="lastUpdatedLabel" styleClass="quaternary-metric"/>
+                        </VBox>
                     </VBox>
                 </StackPane>
             </VBox>

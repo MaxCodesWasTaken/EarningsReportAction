@@ -78,3 +78,8 @@
     -fx-text-fill: #ffffff;
     -fx-font-size: 25px
 }
+.quaternary-metric{
+    -fx-font-family: "Open Sans";
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 10px
+}
